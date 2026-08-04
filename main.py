@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 def get_saramin_jobs(keyword):
     # 등록일순으로 정렬된 사람인 검색 URL
     url = f"https://www.saramin.co.kr/zf_user/search/recruit?searchword={keyword}&recruit_sort=reg_dt"
-    # 봇 차단을 막기 위한 User-Agent 헤더
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
@@ -27,8 +26,7 @@ def get_saramin_jobs(keyword):
             link = "https://www.saramin.co.kr" + item.select_one('.job_tit a')['href']
             date_badge = item.select_one('.job_date .date').text.strip()
             
-            # 조건: '어제' 등록된 공고 위주로 수집
-            # (만약 모든 최신 공고를 다 받고 싶다면 아래 if문을 지우시면 됩니다)
+            # 조건: '어제' 혹은 '오늘' 등록된 신규 공고만 수집
             if '어제등록' in date_badge or '시간전' in date_badge or '오늘등록' in date_badge:
                 jobs.append({
                     'corp': corp_name,
@@ -40,36 +38,50 @@ def get_saramin_jobs(keyword):
             
     return jobs
 
-def send_email(jobs):
+def send_email(jobs_by_keyword):
     sender_email = "sri.jobfair1@gmail.com"
     receiver_email = "sesac@saramin.co.kr"
-    # GitHub Secrets에서 가져올 앱 비밀번호
     password = os.environ.get('GMAIL_APP_PW') 
     
     if not password:
         print("이메일 앱 비밀번호가 설정되지 않았습니다.")
         return
 
-    # 어제 날짜 계산
     yesterday = datetime.now() - timedelta(days=1)
     date_str = yesterday.strftime('%Y년 %m월 %d일')
     
+    # 여러 키워드를 메일 제목에 반영 (예: '공연, 엔터테인먼트')
+    keyword_str = ", ".join(jobs_by_keyword.keys())
+    
     msg = MIMEMultipart()
-    msg['Subject'] = f"[RPA] {date_str} 사람인 '공연' 신규 채용공고 리스트"
+    msg['Subject'] = f"[RPA] {date_str} 사람인 '{keyword_str}' 신규 채용공고"
     msg['From'] = sender_email
     msg['To'] = receiver_email
     
+    # 전체 수집된 공고 개수 계산
+    total_count = sum(len(jobs) for jobs in jobs_by_keyword.values())
+    
     # 메일 본문 작성
-    if len(jobs) == 0:
-        body = f"{date_str} 기준, 새로 등록된 '공연' 관련 채용공고가 없습니다."
+    if total_count == 0:
+        body = f"{date_str} 기준, 새로 등록된 채용공고가 없습니다."
     else:
-        body = f"총 {len(jobs)}건의 신규 공고가 등록되었습니다.\n\n"
-        for i, job in enumerate(jobs, 1):
-            body += f"{i}. {job['corp']} | {job['title']}\n   👉 링크: {job['link']}\n\n"
+        body = f"총 {total_count}건의 신규 공고가 등록되었습니다.\n\n"
+        
+        # 키워드별로 나눠서 보여주기
+        for keyword, jobs in jobs_by_keyword.items():
+            body += f"📌 [{keyword}] 검색 결과 ({len(jobs)}건)\n"
+            body += "-" * 40 + "\n"
+            
+            if len(jobs) == 0:
+                body += "신규 공고가 없습니다.\n\n"
+            else:
+                for i, job in enumerate(jobs, 1):
+                    body += f"{i}. {job['corp']} | {job['title']}\n   👉 링크: {job['link']}\n"
+            body += "\n"
             
     msg.attach(MIMEText(body, 'plain'))
     
-    # 지메일 SMTP 서버를 이용해 메일 발송
+    # 메일 발송
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender_email, password)
@@ -79,7 +91,16 @@ def send_email(jobs):
         print(f"메일 발송 실패: {e}")
 
 if __name__ == "__main__":
-    print("사람인 크롤링 시작...")
-    job_list = get_saramin_jobs("공연")
-    print(f"{len(job_list)}개의 공고를 찾았습니다. 메일을 발송합니다...")
-    send_email(job_list)
+    # 💡 이 부분에 검색하고 싶은 키워드를 얼마든지 추가할 수 있습니다!
+    keywords = ["공연", "엔터테인먼트"]
+    
+    jobs_by_keyword = {} # 키워드별 결과를 저장할 바구니
+    
+    for keyword in keywords:
+        print(f"'{keyword}' 크롤링 시작...")
+        jobs = get_saramin_jobs(keyword)
+        jobs_by_keyword[keyword] = jobs
+        print(f"'{keyword}' 관련 {len(jobs)}개의 공고를 찾았습니다.")
+        
+    print("모든 검색 완료. 메일을 발송합니다...")
+    send_email(jobs_by_keyword)
