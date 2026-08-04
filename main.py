@@ -120,7 +120,7 @@ def send_email(jobs_by_keyword):
         print(f"메일 발송 실패: {e}")
 
 if __name__ == "__main__":
-    keywords = ["공연", "엔터테인먼트"]
+    keywords = ["개발"]
     jobs_by_keyword = {}
     
     for keyword in keywords:
