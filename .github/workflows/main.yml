@@ -2,9 +2,8 @@ name: Saramin RPA Scraper
 
 on:
   schedule:
-    # 한국 시간 기준 매일 오전 09:00 실행 (UTC 시간 기준 00:00 으로 설정해야 한국 09:00이 됩니다)
     - cron: '0 0 * * *'
-  workflow_dispatch: # 이 줄이 있으면 수동으로 즉시 실행해 볼 수도 있습니다.
+  workflow_dispatch:
 
 jobs:
   run-scraper:
@@ -12,10 +11,10 @@ jobs:
     
     steps:
     - name: 저장소 코드 가져오기
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       
     - name: 파이썬 환경 설정
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
         
@@ -26,5 +25,5 @@ jobs:
         
     - name: RPA 파이썬 스크립트 실행 (메일 발송)
       env:
-        GMAIL_APP_PW: ${{ secrets.GMAIL_APP_PW }} # 여기서 아까 저장한 비밀번호를 불러옵니다.
+        GMAIL_APP_PW: ${{ secrets.GMAIL_APP_PW }}
       run: python main.py
