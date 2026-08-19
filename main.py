@@ -124,7 +124,7 @@ if __name__ == "__main__":
         TARGET_EXP_CD = "1"       # 신입
         
         job_groups = [
-            {"name": K-POP, "job_cd": "1370,1333,1345,1281"}
+            {"name": "K-POP", "job_cd": "1370,1333,1345,1281"}
         ]
         
         jobs_results = {}
