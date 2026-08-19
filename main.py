@@ -130,7 +130,7 @@ if __name__ == "__main__":
                 "tag": "K-POP/기획",
                 "receivers": ["sesac@saramin.co.kr"],  # 👈 K-POP 공고 수신 이메일
                 "job_groups": [
-                    {"K-POP", "job_cd": "1370,1333,1345,1281"}
+                    {"name": "K-POP", "job_cd": "1370,1333,1345,1281"}
                 ]
             },
             {
