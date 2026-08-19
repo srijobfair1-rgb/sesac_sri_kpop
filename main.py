@@ -29,18 +29,18 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, loc_cd, exp_cd, api_key
             if isinstance(job_list, dict):
                 job_list = [job_list]
                 
-            today_str = datetime.now().strftime("%Y-%m-%d")
-            yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            kst_now = datetime.utcnow() + timedelta(hours=9)
+            yesterday_str = (kst_now - timedelta(days=1)).strftime("%Y-%m-%d")
                 
             for item in job_list:
                 post_time = item.get("posting-timestamp", "")
                 if post_time:
-                    post_date = datetime.fromtimestamp(int(post_time)).strftime("%Y-%m-%d")
+                    # 등록 타임스탬프도 한국 시간 기준으로 날짜 변환
+                    post_date = (datetime.utcfromtimestamp(int(post_time)) + timedelta(hours=9)).strftime("%Y-%m-%d")
                 else:
-                    post_date = today_str 
+                    post_date = "" 
                 
-                # 어제 ~ 오늘 등록된 공고만 수집
-                if post_date in [today_str, yesterday_str]:
+                if post_date == yesterday_str:
                     corp_name = item.get("company", {}).get("detail", {}).get("name", "기업명 미상")
                     title = item.get("position", {}).get("title", "제목 없음")
                     link = item.get("url", "")
@@ -48,12 +48,11 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, loc_cd, exp_cd, api_key
                     exp_text = item.get("position", {}).get("experience-level", {}).get("name", "")
                     loc_text = item.get("position", {}).get("location", {}).get("name-kr", "")
                     
-                    # 💡 추가: 시작일(opening)과 마감일(expiration) 가져오기
                     open_time = item.get("opening-timestamp", "")
                     close_time = item.get("expiration-timestamp", "")
                     
-                    open_date = datetime.fromtimestamp(int(open_time)).strftime("%Y-%m-%d") if open_time else "-"
-                    close_date = datetime.fromtimestamp(int(close_time)).strftime("%Y-%m-%d") if close_time else "상시채용/채용시 마감"
+                    open_date = (datetime.utcfromtimestamp(int(open_time)) + timedelta(hours=9)).strftime("%Y-%m-%d") if open_time else "-"
+                    close_date = (datetime.utcfromtimestamp(int(close_time)) + timedelta(hours=9)).strftime("%Y-%m-%d") if close_time else "상시채용/채용시 마감"
                     
                     jobs.append({
                         "corp": corp_name,
@@ -75,28 +74,29 @@ def send_email(jobs_results, receiver_emails):
         print("🚨 지메일 비밀번호가 세팅되지 않았습니다.")
         return
 
-    yesterday = datetime.now() - timedelta(days=1)
+    # 메일 제목에도 한국 시간 기준 어제 날짜를 박아줍니다.
+    kst_now = datetime.utcnow() + timedelta(hours=9)
+    yesterday = kst_now - timedelta(days=1)
     date_str = yesterday.strftime("%Y년 %m월 %d일")
     
     msg = MIMEMultipart()
-    msg["Subject"] = f"[RPA] {date_str} 사람인 서울/신입 맞춤 채용공고"
+    msg["Subject"] = f"[RPA] {date_str} 등록분 사람인 서울/신입 채용공고"
     msg["From"] = sender_email
     msg["To"] = ", ".join(receiver_emails)
     
     total_count = sum(len(jobs) for jobs in jobs_results.values())
     
     if total_count == 0:
-        body = f"{date_str} 기준, 설정하신 조건(서울/신입)의 신규 공고가 없습니다."
+        body = f"{date_str}에 등록된 조건(서울/신입)의 신규 공고가 없습니다."
     else:
-        body = f"총 {total_count}건의 맞춤 직무 공고가 수집되었습니다. (어제~오늘 등록분)\n\n"
+        body = f"총 {total_count}건의 공고가 수집되었습니다. (전일 00:00~23:59 등록분)\n\n"
         for group_name, jobs in jobs_results.items():
-            body += f"📌 [{group_name}] 신규 공고 ({len(jobs)}건)\n"
+            body += f"📌 [{group_name}] 전일 등록 공고 ({len(jobs)}건)\n"
             body += "-" * 50 + "\n"
             if not jobs:
-                body += "해당 직무의 신규 공고가 없습니다.\n\n"
+                body += "해당 직무에 전일 등록된 공고가 없습니다.\n\n"
             else:
                 for i, job in enumerate(jobs, 1):
-                    # 💡 추가: 메일 내용에 시작일과 마감일을 표시하도록 수정
                     body += f"{i}. {job['corp']} | {job['title']}\n"
                     body += f"   📅 접수기간: {job['open_date']} ~ {job['close_date']}\n"
                     body += f"   👉 링크: {job['link']}\n\n"
@@ -118,7 +118,6 @@ if __name__ == "__main__":
     if not api_key:
         print("🚨 오류: SARAMIN_API_KEY가 등록되지 않았습니다.")
     else:
-        # 수신 이메일 리스트 (쉼표로 구분하여 여러 개 추가 가능)
         RECEIVER_EMAILS = [
             "sesac@saramin.co.kr"
         ]
@@ -138,5 +137,3 @@ if __name__ == "__main__":
             print(f"[{group['name']}] {len(jobs)}건 수집 완료")
             
         send_email(jobs_results, RECEIVER_EMAILS)
-
-
