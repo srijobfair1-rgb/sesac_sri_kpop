@@ -12,10 +12,10 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, loc_cd, exp_cd, api_key
     params = {
         "access-key": api_key,
         "job_cd": job_cd_string,  
-        "loc_cd": loc_cd,             # 지역 (예: 서울 101000)
-        "experience_level": exp_cd,   # 경력 (예: 신입 1)
-        "sort": "pd",                 # 최신순
-        "count": "110"                # 최대 수집 개수
+        "loc_cd": loc_cd,             
+        "experience_level": exp_cd,   
+        "sort": "pd",                 
+        "count": "110"                
     }
     
     jobs = []
@@ -48,13 +48,19 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, loc_cd, exp_cd, api_key
                     exp_text = item.get("position", {}).get("experience-level", {}).get("name", "")
                     loc_text = item.get("position", {}).get("location", {}).get("name-kr", "")
                     
-                    display_date = datetime.fromtimestamp(int(post_time)).strftime("%m/%d") if post_time else "최신"
+                    # 💡 추가: 시작일(opening)과 마감일(expiration) 가져오기
+                    open_time = item.get("opening-timestamp", "")
+                    close_time = item.get("expiration-timestamp", "")
+                    
+                    open_date = datetime.fromtimestamp(int(open_time)).strftime("%Y-%m-%d") if open_time else "-"
+                    close_date = datetime.fromtimestamp(int(close_time)).strftime("%Y-%m-%d") if close_time else "상시채용/채용시 마감"
                     
                     jobs.append({
                         "corp": corp_name,
                         "title": f"[{exp_text}/{loc_text}] {title}",
                         "link": link,
-                        "date": display_date
+                        "open_date": open_date,
+                        "close_date": close_date
                     })
     except Exception as e:
         print(f"[{group_name}] API 에러: {e}")
@@ -75,7 +81,6 @@ def send_email(jobs_results, receiver_emails):
     msg = MIMEMultipart()
     msg["Subject"] = f"[RPA] {date_str} 사람인 서울/신입 맞춤 채용공고"
     msg["From"] = sender_email
-    # 여러 수신자 주소를 쉼표로 연결하여 헤더에 지정
     msg["To"] = ", ".join(receiver_emails)
     
     total_count = sum(len(jobs) for jobs in jobs_results.values())
@@ -91,7 +96,10 @@ def send_email(jobs_results, receiver_emails):
                 body += "해당 직무의 신규 공고가 없습니다.\n\n"
             else:
                 for i, job in enumerate(jobs, 1):
-                    body += f"{i}. {job['corp']} | {job['title']} ({job['date']})\n   👉 링크: {job['link']}\n"
+                    # 💡 추가: 메일 내용에 시작일과 마감일을 표시하도록 수정
+                    body += f"{i}. {job['corp']} | {job['title']}\n"
+                    body += f"   📅 접수기간: {job['open_date']} ~ {job['close_date']}\n"
+                    body += f"   👉 링크: {job['link']}\n\n"
             body += "\n"
             
     msg.attach(MIMEText(body, "plain"))
@@ -99,7 +107,6 @@ def send_email(jobs_results, receiver_emails):
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(sender_email, password)
-            # send_message에 msg를 그대로 넘기면 msg["To"]의 복수 메일로 각각 발송됩니다.
             server.send_message(msg)
         print("✅ 메일 발송 성공!")
     except Exception as e:
@@ -111,13 +118,9 @@ if __name__ == "__main__":
     if not api_key:
         print("🚨 오류: SARAMIN_API_KEY가 등록되지 않았습니다.")
     else:
-        # =========================================================
-        # 💡 [복수 메일 수신 설정]
-        # 아래 리스트 안에 수신받을 이메일을 큰따옴표로 적어주세요.
-        # =========================================================
+        # 수신 이메일 리스트 (쉼표로 구분하여 여러 개 추가 가능)
         RECEIVER_EMAILS = [
-            "sesac@saramin.co.kr",
-            "ghnam@saramin.co.kr"  # 👈 여기에 두 번째 메일 주소를 적으세요!
+            "sesac@saramin.co.kr"
         ]
         
         TARGET_LOC_CD = "101000"  # 서울 전체
@@ -135,3 +138,5 @@ if __name__ == "__main__":
             print(f"[{group['name']}] {len(jobs)}건 수집 완료")
             
         send_email(jobs_results, RECEIVER_EMAILS)
+
+
