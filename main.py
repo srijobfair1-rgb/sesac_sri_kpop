@@ -120,9 +120,9 @@ if __name__ == "__main__":
         TARGET_LOC_CD = "101000"  # 서울 전체
         TARGET_EXP_CD = "1"       # 신입
         
-            # =====================================================================
-        # 💡 [핵심] 수신 타겟별로 메일주소와 직무 그룹을 각각 설정합니다.
-        # 원하는 만큼 { ... } 블록을 늘려주기만 하면 됩니다.
+        # =====================================================================
+        # 💡 [그룹별 독립 발송 설정]
+        # receivers에 서로 다른 이메일을 넣으면 각각 해당 공고만 받아봅니다.
         # =====================================================================
         email_targets = [
             {
@@ -133,13 +133,12 @@ if __name__ == "__main__":
                 ]
             },
             {
-                "tag": "TesT",
-                "receivers": ["ghnam@saramin.co.kr"],
+                "tag": "마케팅",
+                "receivers": ["ghnam@saramin.co.kr"],  # 👈 B 전용 메일 주소
                 "job_groups": [
-                {"name": "보안", "job_cd": "2239,90"}
+                    {"name": "마케팅", "job_cd": "1412"}
                 ]
-            },
-            
+            }
             # 💡 필요시 타겟 추가 예시:
             # {
             #     "tag": "디자인팀",
@@ -150,15 +149,14 @@ if __name__ == "__main__":
             # }
         ]
         
-        print("🚀 그룹별 맞춤 사람인 API 크롤링 및 발송 시작...\n")
+        print("🚀 그룹별 개별 맞춤 크롤링 및 발송 시작...\n")
         
-        # 설정된 타겟 수만큼 반복 실행
         for target in email_targets:
             tag = target["tag"]
             receivers = target["receivers"]
             groups = target["job_groups"]
             
-            print(f"📌 [{tag}] 작업 진행 중...")
+            print(f"📌 [{tag}] 공고 수집 중...")
             jobs_results = {}
             
             for group in groups:
