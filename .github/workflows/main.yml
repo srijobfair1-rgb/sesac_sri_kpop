@@ -1,12 +1,12 @@
-name: Saramin RPA Scraper (Playwright)
+name: Saramin RPA API
 
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 0 * * *'  # 한국시간 매일 오전 9시 작동
+  workflow_dispatch:     # 수동 실행 버튼 활성화
 
 jobs:
-  run-scraper:
+  run-api-notifier:
     runs-on: ubuntu-latest
     
     steps:
@@ -18,17 +18,13 @@ jobs:
       with:
         python-version: '3.10'
         
-    - name: 필요한 라이브러리 설치
+    - name: 라이브러리 설치
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
-    - name: Playwright 가상 브라우저 설치
-      run: |
-        playwright install chromium
-        playwright install-deps chromium
-        
-    - name: RPA 파이썬 스크립트 실행 (메일 발송)
+    - name: 사람인 API 호출 및 메일 발송
       env:
         GMAIL_APP_PW: ${{ secrets.GMAIL_APP_PW }}
+        SARAMIN_API_KEY: ${{ secrets.SARAMIN_API_KEY }}
       run: python main.py
