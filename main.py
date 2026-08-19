@@ -12,8 +12,10 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
     params = {
         "access-key": api_key,
         "job_cd": job_cd_string,  # 직무코드 (예: "84,86,87")
+        "loc_cd": loc_cd,             # 지역 (예: 서울 101000)
+        "experience_level": exp_cd,   # 경력 (예: 신입 1)
         "sort": "pd",             # 최신순
-        "count": "110"            # 최대 수집 개수
+        "count": "50"            # 최대 수집 개수
     }
     
     jobs = []
@@ -30,7 +32,7 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
             today_str = datetime.now().strftime("%Y-%m-%d")
             yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
                 
-            for item in job_list:
+          for item in job_list:
                 post_time = item.get("posting-timestamp", "")
                 if post_time:
                     post_date = datetime.fromtimestamp(int(post_time)).strftime("%Y-%m-%d")
@@ -42,11 +44,16 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
                     corp_name = item.get("company", {}).get("detail", {}).get("name", "기업명 미상")
                     title = item.get("position", {}).get("title", "제목 없음")
                     link = item.get("url", "")
+                    
+                    # 💡 보기 좋게 경력과 근무지 정보도 뽑아서 제목 뒤에 붙여줍니다.
+                    exp_text = item.get("position", {}).get("experience-level", {}).get("name", "")
+                    loc_text = item.get("position", {}).get("location", {}).get("name-kr", "")
+                    
                     display_date = datetime.fromtimestamp(int(post_time)).strftime("%m/%d") if post_time else "최신"
                     
                     jobs.append({
                         "corp": corp_name,
-                        "title": title,
+                        "title": f"[{exp_text}/{loc_text}] {title}", # 메일에 경력/지역 표시
                         "link": link,
                         "date": display_date
                     })
@@ -57,7 +64,7 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
 
 def send_email(jobs_results):
     sender_email = "sri.jobfair1@gmail.com"
-    receiver_email = "sesac@saramin.co.kr"
+    receiver_email = "sesac@saramin.co.kr,ghnam@saramin.co.kr"
     password = os.environ.get("GMAIL_APP_PW")
     
     if not password:
@@ -104,7 +111,15 @@ if __name__ == "__main__":
     if not api_key:
         print("🚨 오류: SARAMIN_API_KEY가 등록되지 않았습니다.")
     else:
-        # 💡 직무 그룹 설정 (코드표 참고해서 원하는 숫자를 넣으세요!)
+       # =========================================================
+        # 💡 [핵심 설정] 지역 및 경력 코드 설정 (여기서 맘대로 바꾸세요!)
+        # =========================================================
+        # 101000 : 서울 전체 (다른 지역은 코드표 참고)
+        TARGET_LOC_CD = "101000" 
+        
+        # 1: 신입
+        # 꿀팁: 만약 '신입/경력', '경력무관'도 가져오고 싶다면 "1,3,0" 이라고 적으세요!
+        TARGET_EXP_CD = "1"
         job_groups = [
             {"name": "K-POP", "job_cd": "1370,1333,1345,1281"}
         ]
@@ -112,7 +127,8 @@ if __name__ == "__main__":
         jobs_results = {}
         print("🚀 사람인 API 크롤링 시작...")
         for group in job_groups:
-            jobs = get_saramin_jobs_by_jobcd(group["name"], group["job_cd"], api_key)
+            # 설정한 지역, 경력 코드를 함께 던져줍니다.
+            jobs = get_saramin_jobs_by_jobcd(group["name"], group["job_cd"], TARGET_LOC_CD, TARGET_EXP_CD, api_key)
             jobs_results[group["name"]] = jobs
             print(f"[{group['name']}] {len(jobs)}건 수집 완료")
             
