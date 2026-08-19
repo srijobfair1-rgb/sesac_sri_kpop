@@ -5,17 +5,17 @@ from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
+def get_saramin_jobs_by_jobcd(group_name, job_cd_string, loc_cd, exp_cd, api_key):
     url = "https://oapi.saramin.co.kr/job-search"
     headers = {"Accept": "application/json"}
     
     params = {
         "access-key": api_key,
-        "job_cd": job_cd_string,  # 직무코드 (예: "84,86,87")
+        "job_cd": job_cd_string,  
         "loc_cd": loc_cd,             # 지역 (예: 서울 101000)
         "experience_level": exp_cd,   # 경력 (예: 신입 1)
-        "sort": "pd",             # 최신순
-        "count": "50"            # 최대 수집 개수
+        "sort": "pd",                 # 최신순
+        "count": "110"                # 최대 수집 개수
     }
     
     jobs = []
@@ -32,7 +32,7 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
             today_str = datetime.now().strftime("%Y-%m-%d")
             yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
                 
-          for item in job_list:
+            for item in job_list:
                 post_time = item.get("posting-timestamp", "")
                 if post_time:
                     post_date = datetime.fromtimestamp(int(post_time)).strftime("%Y-%m-%d")
@@ -45,7 +45,6 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
                     title = item.get("position", {}).get("title", "제목 없음")
                     link = item.get("url", "")
                     
-                    # 💡 보기 좋게 경력과 근무지 정보도 뽑아서 제목 뒤에 붙여줍니다.
                     exp_text = item.get("position", {}).get("experience-level", {}).get("name", "")
                     loc_text = item.get("position", {}).get("location", {}).get("name-kr", "")
                     
@@ -53,7 +52,7 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
                     
                     jobs.append({
                         "corp": corp_name,
-                        "title": f"[{exp_text}/{loc_text}] {title}", # 메일에 경력/지역 표시
+                        "title": f"[{exp_text}/{loc_text}] {title}",
                         "link": link,
                         "date": display_date
                     })
@@ -62,9 +61,8 @@ def get_saramin_jobs_by_jobcd(group_name, job_cd_string, api_key):
         
     return jobs
 
-def send_email(jobs_results):
+def send_email(jobs_results, receiver_emails):
     sender_email = "sri.jobfair1@gmail.com"
-    receiver_email = "sesac@saramin.co.kr,ghnam@saramin.co.kr"
     password = os.environ.get("GMAIL_APP_PW")
     
     if not password:
@@ -75,14 +73,15 @@ def send_email(jobs_results):
     date_str = yesterday.strftime("%Y년 %m월 %d일")
     
     msg = MIMEMultipart()
-    msg["Subject"] = f"[RPA] {date_str} 사람인 맞춤 직무 신규 채용공고"
+    msg["Subject"] = f"[RPA] {date_str} 사람인 서울/신입 맞춤 채용공고"
     msg["From"] = sender_email
-    msg["To"] = receiver_email
+    # 여러 수신자 주소를 쉼표로 연결하여 헤더에 지정
+    msg["To"] = ", ".join(receiver_emails)
     
     total_count = sum(len(jobs) for jobs in jobs_results.values())
     
     if total_count == 0:
-        body = f"{date_str} 기준, 설정하신 직무에 등록된 신규 공고가 없습니다."
+        body = f"{date_str} 기준, 설정하신 조건(서울/신입)의 신규 공고가 없습니다."
     else:
         body = f"총 {total_count}건의 맞춤 직무 공고가 수집되었습니다. (어제~오늘 등록분)\n\n"
         for group_name, jobs in jobs_results.items():
@@ -100,6 +99,7 @@ def send_email(jobs_results):
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(sender_email, password)
+            # send_message에 msg를 그대로 넘기면 msg["To"]의 복수 메일로 각각 발송됩니다.
             server.send_message(msg)
         print("✅ 메일 발송 성공!")
     except Exception as e:
@@ -111,25 +111,27 @@ if __name__ == "__main__":
     if not api_key:
         print("🚨 오류: SARAMIN_API_KEY가 등록되지 않았습니다.")
     else:
-       # =========================================================
-        # 💡 [핵심 설정] 지역 및 경력 코드 설정 (여기서 맘대로 바꾸세요!)
         # =========================================================
-        # 101000 : 서울 전체 (다른 지역은 코드표 참고)
-        TARGET_LOC_CD = "101000" 
+        # 💡 [복수 메일 수신 설정]
+        # 아래 리스트 안에 수신받을 이메일을 큰따옴표로 적어주세요.
+        # =========================================================
+        RECEIVER_EMAILS = [
+            "sesac@saramin.co.kr",
+            "ghnam@saramin.co.kr"  # 👈 여기에 두 번째 메일 주소를 적으세요!
+        ]
         
-        # 1: 신입
-        # 꿀팁: 만약 '신입/경력', '경력무관'도 가져오고 싶다면 "1,3,0" 이라고 적으세요!
-        TARGET_EXP_CD = "1"
+        TARGET_LOC_CD = "101000"  # 서울 전체
+        TARGET_EXP_CD = "1"       # 신입
+        
         job_groups = [
-            {"name": "K-POP", "job_cd": "1370,1333,1345,1281"}
+            {"name": K-POP, "job_cd": "1370,1333,1345,1281"}
         ]
         
         jobs_results = {}
         print("🚀 사람인 API 크롤링 시작...")
         for group in job_groups:
-            # 설정한 지역, 경력 코드를 함께 던져줍니다.
             jobs = get_saramin_jobs_by_jobcd(group["name"], group["job_cd"], TARGET_LOC_CD, TARGET_EXP_CD, api_key)
             jobs_results[group["name"]] = jobs
             print(f"[{group['name']}] {len(jobs)}건 수집 완료")
             
-        send_email(jobs_results)
+        send_email(jobs_results, RECEIVER_EMAILS)
