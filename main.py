@@ -138,13 +138,6 @@ if __name__ == "__main__":
                      {"name": "K-POP", "job_cd": "1370,1333,1389"}
                 ]
             }
-              #{
-              #   "tag": "백엔드 테스트",
-              #  "receivers": ["ghnam@saramin.co.kr"], # 👈 실제 받으실 두 번째 메일 주소
-              #   "job_groups": [
-              #      {"name": "IT·개발 전체", "job_cd": "84"}
-              #  ]
-              # }
         ]
         
         print("🚀 [RPA 크롤러 시작] 그룹별 개별 수집 및 발송 진행...\n")
