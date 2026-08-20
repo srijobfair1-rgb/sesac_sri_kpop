@@ -132,19 +132,19 @@ if __name__ == "__main__":
         # 코드가 절대 꼬이지 않도록 배열(List) 구조를 가장 직관적으로 분리했습니다.
         email_targets = [
             {
-                "tag": "K-POP",
+                "tag": "케이랩컴퍼니 'K-Pop'",
                 "receivers": ["sesac@saramin.co.kr"], # 👈 실제 받으실 첫 번째 메일 주소
                 "job_groups": [
-                     {"name": "K-POP", "job_cd": "1370,1333,1345,1281"}
-                ]
-            },
-            {
-                "tag": "백엔드 테스트",
-                "receivers": ["ghnam@saramin.co.kr"], # 👈 실제 받으실 두 번째 메일 주소
-                "job_groups": [
-                    {"name": "IT·개발 전체", "job_cd": "84"}
+                     {"name": "K-POP", "job_cd": "1370,1333,1389"}
                 ]
             }
+              #{
+              #   "tag": "백엔드 테스트",
+              #  "receivers": ["ghnam@saramin.co.kr"], # 👈 실제 받으실 두 번째 메일 주소
+              #   "job_groups": [
+              #      {"name": "IT·개발 전체", "job_cd": "84"}
+              #  ]
+              # }
         ]
         
         print("🚀 [RPA 크롤러 시작] 그룹별 개별 수집 및 발송 진행...\n")
