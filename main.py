@@ -140,7 +140,7 @@ if __name__ == "__main__":
             },
              {
                 "tag": "마케팅/MD",
-                "receivers": ["queensspeech1@gmail.com"], # 👈 실제 받으실 첫 번째 메일 주소
+                "receivers": ["queensspeech1@gmail.com","sesac@saramin.co.kr"], # 👈 실제 받으실 첫 번째 메일 주소
                 "job_groups": [
                      {"name": "마케팅/MD", "job_cd": "1429,1435,2201,2245,2237"}
                 ]
