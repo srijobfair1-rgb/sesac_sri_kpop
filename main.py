@@ -137,6 +137,13 @@ if __name__ == "__main__":
                 "job_groups": [
                      {"name": "K-POP", "job_cd": "1370,1333,1389"}
                 ]
+            },
+             {
+                "tag": "양천캠퍼스'",
+                "receivers": ["sesac@saramin.co.kr"], # 👈 실제 받으실 첫 번째 메일 주소
+                "job_groups": [
+                     {"name": "마케팅/MD", "job_cd": "1429,1435,2201,2245,2237"}
+                ]
             }
         ]
         
