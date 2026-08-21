@@ -131,13 +131,6 @@ if __name__ == "__main__":
         # 각 부서(메일함)별로 수집할 직무와 수신자를 독립적으로 지정합니다.
         # 코드가 절대 꼬이지 않도록 배열(List) 구조를 가장 직관적으로 분리했습니다.
         email_targets = [
-            {
-                "tag": "케이랩컴퍼니 'K-Pop'",
-                "receivers": ["sesac@saramin.co.kr"], # 👈 실제 받으실 첫 번째 메일 주소
-                "job_groups": [
-                     {"name": "K-POP", "job_cd": "1370,1333,1389"}
-                ]
-            },
              {
                 "tag": "마케팅/MD",
                 "receivers": ["sesac@saramin.co.kr"],
