@@ -131,11 +131,32 @@ if __name__ == "__main__":
         # 각 부서(메일함)별로 수집할 직무와 수신자를 독립적으로 지정합니다.
         # 코드가 절대 꼬이지 않도록 배열(List) 구조를 가장 직관적으로 분리했습니다.
         email_targets = [
+            {
+                "tag": "케이랩컴퍼니 'K-Pop'",
+                "receivers": ["sesac@saramin.co.kr"], 
+                "job_groups": [
+                     {"name": "K-POP", "job_cd": "1370,1333,1389"}
+                ]
+            },
              {
-                "tag": "마케팅/MD",
+                "tag": "브랜드마케팅",
                 "receivers": ["sesac@saramin.co.kr"],
                 "job_groups": [
-                     {"name": "마케팅/MD", "job_cd": "1429,1435,2201,2245,2237"}
+                     {"name": "브랜드마케팅", "job_cd": "1429,1435,2201,2245,2237,1215,1218,1219"}
+                ]
+            },
+             {
+                "tag": "바이브코딩",
+                "receivers": ["sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "바이브코딩", "job_cd": "1635,1649,1658"}
+                ]
+            },
+             {
+                "tag": "콘텐츠디자인",
+                "receivers": ["sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "콘텐츠디자인", "job_cd": "1488,1515,1529"}
                 ]
             }
         ]
