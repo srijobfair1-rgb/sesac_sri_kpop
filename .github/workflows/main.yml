@@ -2,7 +2,7 @@ name: Saramin RPA API
 
 on:
   schedule:
-    - cron: '15 0 * * *'  # 한국시간 매일 오전 09:15 (정각 피하기)
+    - cron: '38 23 * * *'  # 한국시간 매일 오전 08:28 (정각 피하기)
   workflow_dispatch:     # 수동 실행 버튼
 
 jobs:
