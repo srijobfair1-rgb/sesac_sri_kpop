@@ -16,7 +16,8 @@ def get_saramin_jobs(group_name, job_cd_string, loc_cd, exp_cd, api_key):
         "loc_cd": loc_cd,             
         "experience_level": exp_cd,   
         "sort": "pd",                 
-        "count": "110"                
+        "count": "110"
+        "sr": "directhire"
     }
     
     jobs_collected = []
