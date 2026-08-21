@@ -143,21 +143,21 @@ if __name__ == "__main__":
             },
             {
                 "tag": "브랜드마케팅",
-                "receivers": ["queensspeech1@gmail.com"],
+                "receivers": ["sesac@saramin.co.kr"],
                 "job_groups": [
                      {"name": "브랜드마케팅", "job_cd": "1429,1435,2201,2245,2237,1215,1218,1219"}
                 ]
             },
             {
                 "tag": "바이브코딩",
-                "receivers": ["queensspeech1@gmail.com"],
+                "receivers": ["sesac@saramin.co.kr"],
                 "job_groups": [
                      {"name": "바이브코딩", "job_cd": "1635,1649,1658"}
                 ]
             },
             {
                 "tag": "콘텐츠디자인",
-                "receivers": ["queensspeech1@gmail.com"],
+                "receivers": ["sesac@saramin.co.kr"],
                 "job_groups": [
                      {"name": "콘텐츠디자인", "job_cd": "1488,1515,1529"}
                 ]
