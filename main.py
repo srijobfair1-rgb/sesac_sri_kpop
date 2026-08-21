@@ -130,7 +130,7 @@ if __name__ == "__main__":
         print("🚨 SARAMIN_API_KEY가 없습니다.")
     else:
         TARGET_LOC_CD = "101000"  # 서울
-        TARGET_EXP_CD = "1"       # 순수 신입 (1)
+        TARGET_EXP_CD = "0,1"       # 순수 신입 (1)
         
         # 💡 [반영 완료] 요청하신 4개의 이메일 타겟 설정
         email_targets = [
