@@ -161,6 +161,13 @@ if __name__ == "__main__":
                 "job_groups": [
                      {"name": "콘텐츠디자인", "job_cd": "1488,1515,1529"}
                 ]
+            },
+            {
+                "tag": "굿즈MD",
+                "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "굿즈MD", "job_cd": "1212,1512,1435"}
+                ]
             }
         ]
         
