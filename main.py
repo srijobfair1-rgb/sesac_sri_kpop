@@ -166,7 +166,7 @@ if __name__ == "__main__":
                 "tag": "굿즈MD",
                 "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
                 "job_groups": [
-                     {"name": "굿즈MD", "job_cd": "1212,1512,1435"}
+                     {"name": "굿즈MD", "job_cd": "1212,1218,1215,1261"}
                 ]
             }
         ]
