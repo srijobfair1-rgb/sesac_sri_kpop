@@ -168,6 +168,27 @@ if __name__ == "__main__":
                 "job_groups": [
                      {"name": "굿즈MD", "job_cd": "1212,1218,1215,1261"}
                 ]
+            },
+            {
+                "tag": "아이리포",
+                "receivers": ["9006job@naver.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "아이리포", "job_cd": "82,83,141"}
+                ]
+            },
+            {
+                "tag": "국제인재능력개발원",
+                "receivers": ["9006job@naver.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "국제인재능력개발원", "job_cd": "136,84,87"}
+                ]
+            },
+            {
+                "tag": "클래스101",
+                "receivers": ["9006job@naver.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "클래스101", "job_cd": "1425,1416,1437"}
+                ]
             }
         ]
         
