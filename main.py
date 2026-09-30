@@ -182,6 +182,41 @@ if __name__ == "__main__":
                 "job_groups": [
                      {"name": "클래스101", "job_cd": "1425,1416,1437"}
                 ]
+            },
+            {
+                "tag": "기획 및 아이템 발굴",
+                "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "기획 및 아이템 발굴", "job_cd": "1212,1237,1252,1265"}
+                ]
+            },
+            {
+                "tag": "브랜드 및 IP 관리",
+                "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "브랜드 및 IP 관리", "job_cd": "1215,1236,1238,1240"}
+                ]
+            },
+            {
+                "tag": "오프라인 및 팝업 스토어",
+                "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "오프라인 및 팝업 스토어", "job_cd": "1218,1213,1267,1271"}
+                ]
+            },
+            {
+                "tag": "온라인·이커머스 채널",
+                "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "온라인·이커머스 채널", "job_cd": "1219,1258,1245,1259"}
+                ]
+            },
+            {
+                "tag": "시장 조사 및 전략",
+                "receivers": ["osiawaseni.s@gmail.com","sesac@saramin.co.kr"],
+                "job_groups": [
+                     {"name": "시장 조사 및 전략", "job_cd": "1248,1242,1266,1272"}
+                ]
             }
         ]
         
